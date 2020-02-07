@@ -3,7 +3,7 @@
   file:
     path: "{{ nexus_datadir }}"
     owner: "{{ nexus_uid }}"
-    mode: '0644'
+    mode: "{{ nexus_datadir_mode }}"
     state: directory
 
 - name: "{{ nexus_task_prefix }} Create container"

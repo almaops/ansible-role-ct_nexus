@@ -4,6 +4,7 @@ nexus_task_prefix: "=== NEXUS OSS ==="
 nexus_bind_addr: '127.0.0.1'
 nexus_bind_port: '8081'
 nexus_datadir: "/opt/nexus"
+nexus_datadir_mode: '0755'
 nexus_uid: '200'
 # Container settings
 nexus_container_bind_port: '8081'
