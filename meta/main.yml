@@ -1,6 +1,6 @@
 galaxy_info:
   author: Valentin Gostev
-  role_name: nexus
+  role_name: ct_nexus
   description: Role installs Nexus OSS in Docker container
   license: MIT
   min_ansible_version: 2.8

@@ -1,20 +1,72 @@
 ---
-- name: "{{ nexus_task_prefix }} Create data directory"
-  file:
-    path: "{{ nexus_datadir }}"
-    owner: "{{ nexus_uid }}"
-    mode: "{{ nexus_datadir_mode }}"
-    state: directory
 
-- name: "{{ nexus_task_prefix }} Create container"
+- name: "{{ ct_nexus_task_prefix }} Load persistent volumes"
+  include_vars: "persist_data.yml"
+  when: ct_nexus_persist_data
+
+- name: "{{ ct_nexus_task_prefix }} Create data directory"
+  file:
+    path: "{{ ct_nexus_path_data }}"
+    owner: "{{ ct_nexus_path_data_uid }}"
+    mode: "{{ ct_nexus_path_data_mode }}"
+    state: directory
+    recurse: true
+  when: ct_nexus_persist_data
+
+- name: "{{ ct_nexus_task_prefix }} Create container"
   docker_container:
-    image: "{{ nexus_container_image }}"
-    name: "{{ nexus_container_name }}"
-    ports:
-      - "{{ nexus_bind_addr }}:{{ nexus_bind_port }}:{{ nexus_container_bind_port }}"
-    pull: "{{ nexus_container_pull }}"
-    recreate: "{{ nexus_container_recreate }}"
-    restart_policy: "{{ nexus_container_restart_policy }}"
-    state: "{{ nexus_container_state }}"
-    volumes:
-      - "{{ nexus_datadir }}:{{ nexus_container_dir }}:rw"
+    name: "{{ ct_nexus_ct_name }}"
+    image: "{{ ct_nexus_ct_image }}:{{ ct_nexus_ct_version }}"
+    ports: "{{ ct_nexus_ct_ports }}"
+    restart_policy: "{{ ct_nexus_ct_restart_policy }}"
+    state: "{{ ct_nexus_ct_state }}"
+    restart: "{{ ct_nexus_ct_restart | bool }}"
+    pull: "{{ ct_nexus_ct_pull | bool }}"
+    recreate: "{{ ct_nexus_ct_recreate | bool }}"
+    volumes: "{{ ct_nexus_ct_volumes }}"
+
+- name: "{{ ct_nexus_task_prefix }} Wait nexus to start"
+  wait_for:
+    host: "{{ ct_nexus_bind_addr }}"
+    port: "{{ ct_nexus_bind_port }}"
+    delay: "{{ ct_nexus_wait_startup_delay }}"
+    timeout: "{{ ct_nexus_wait_startup_timeout }}"
+  when: ct_nexus_wait_startup or ct_nexus_set_admin_password
+
+- name: "{{ ct_nexus_task_prefix }} Check if admin.password file exists"
+  stat:
+    path: "{{ ct_nexus_path_data }}/admin.password"
+  register: ct_nexus_admin_password_file
+  when:
+    - ct_nexus_set_admin_password
+
+- name: "{{ ct_nexus_task_prefix }} Get admin password"
+  slurp:
+    src: "{{ ct_nexus_path_data }}/admin.password"
+  register: ct_nexus_admin_password_generated
+  when:
+    - ct_nexus_set_admin_password
+    - ct_nexus_admin_password_file.stat.exists
+
+- name: "{{ ct_nexus_task_prefix }} Set admin password"
+  uri:
+    url: "http://{{ ct_nexus_bind_addr }}:{{ ct_nexus_bind_port }}/service/rest/v1/security/users/admin/change-password"
+    method: "PUT"
+    force_basic_auth: true
+    user: "admin"
+    password: "{{ ct_nexus_admin_password_generated.content | b64decode }}"
+    headers:
+      Content-Type: "text/plain"
+    status_code: [200, 204]
+    body: "{{ ct_nexus_admin_password }}"
+  when:
+    - ct_nexus_set_admin_password
+    - ct_nexus_admin_password_file.stat.exists
+
+- name: "{{ ct_nexus_task_prefix }} Remove admin.password file"
+  file:
+    path: "{{ ct_nexus_path_data }}/admin.password"
+    state: absent
+  when:
+    - ct_nexus_set_admin_password
+    - ct_nexus_admin_password_file.stat.exists

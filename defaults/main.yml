@@ -1,17 +1,37 @@
 ---
-nexus_task_prefix: "=== NEXUS OSS ==="
-# Nexus settings
-nexus_bind_addr: '127.0.0.1'
-nexus_bind_port: '8081'
-nexus_datadir: "/opt/nexus"
-nexus_datadir_mode: '0755'
-nexus_uid: '200'
+# Nexus general settings
+ct_nexus_task_prefix: "=== NEXUS OSS ==="
+
+# Common settings
+ct_nexus_persist_data: true
+ct_nexus_set_admin_password: true
+ct_nexus_wait_startup: true
+
+# Path settings
+ct_nexus_path_data: "/srv/nexus"
+ct_nexus_path_ct_data: "/nexus-data"
+ct_nexus_path_data_mode: '0755'
+ct_nexus_path_data_uid: '200'
+
+# Network settings
+ct_nexus_bind_addr: '127.0.0.1'
+ct_nexus_bind_port: '8081'
+ct_nexus_bind_ct_port: '8081'
+
 # Container settings
-nexus_container_bind_port: '8081'
-nexus_container_image: "sonatype/nexus3:{{ nexus_container_tag | default('latest') }}"
-nexus_container_name: "nexus"
-nexus_container_pull: "no"
-nexus_container_recreate: "no"
-nexus_container_restart_policy: "always"
-nexus_container_state: "started"
-nexus_container_dir: "/nexus-data"
+ct_nexus_ct_name: "nexus"
+ct_nexus_ct_image: "sonatype/nexus3"
+ct_nexus_ct_version: "latest"
+ct_nexus_ct_restart_policy: "always"
+ct_nexus_ct_pull: "false"
+ct_nexus_ct_recreate: "false"
+ct_nexus_ct_state: "started"
+ct_nexus_ct_restart: "false"
+ct_nexus_ct_volumes: []
+ct_nexus_ct_ports:
+  - "{{ ct_nexus_bind_addr }}:{{ ct_nexus_bind_port }}:{{ ct_nexus_bind_ct_port }}"
+
+# Configuration settings
+ct_nexus_admin_password: "AlmaOPS_112"
+ct_nexus_wait_startup_delay: "10" # seconds
+ct_nexus_wait_startup_timeout: "90" # seconds

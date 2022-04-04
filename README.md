@@ -1,7 +1,7 @@
-Nexus OSS
+almaops.ct_nexus
 ==========
 
-Ansible role installs Docker container with NExus OSS
+This ansible role installs a docker container with Nexus OSS
 
 Requirements
 ------------
@@ -11,21 +11,25 @@ Docker running on target host
 Role Variables
 --------------
 
-see [./defaults/main.yml](./defaults/main.yml)
+Look into [./defaults/main.yml](./defaults/main.yml)
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
 ```
 - hosts: servers
   roles:
-    - role: ussrlongbow.nexus
-      nexus_bind_addr: '192.168.0.2'
+    - role: almaops.ct_nexus
+      ct_nexus_bind_addr: '192.168.0.2'
 ```
 
 License
 -------
 
 [MIT License](./LICENSE)
+
+
+Author Information
+------------------
+Valentin Gostev, <val@le.lc>
+Dmitrii Kashin, <freehck@freehck.com>

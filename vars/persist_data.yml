@@ -1,0 +1,4 @@
+---
+ct_nexus_ct_volumes:
+  - "{{ ct_nexus_path_data }}:{{ ct_nexus_path_ct_data }}:rw"
+...
