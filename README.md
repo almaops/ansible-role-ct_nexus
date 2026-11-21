@@ -1,3 +1,6 @@
+# DEPRECATION NOTICE
+This role has been deprecated in favor of [almaops.common.ct_nexus](https://github.com/almaops/ansible-collection-common/tree/master/roles/ct_nexus)
+
 almaops.ct_nexus
 ==========
 
